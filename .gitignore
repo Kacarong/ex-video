@@ -9,3 +9,4 @@ output/
 venv/
 .DS_Store
 .venv-test/
+web/jobs/

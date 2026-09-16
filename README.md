@@ -53,6 +53,19 @@ python -m exvideo "https://drive.google.com/file/d/FILEID/view" -o output
 `bundle.md` 를 열어 맨 위 `[요청]` 칸에 원하는 정리 방식을 적고, 전체를 복사해
 Gemini/Claude에 붙여넣으세요. 도표가 중요하면 `figures/` 이미지를 함께 첨부하면 됩니다.
 
+## 웹앱으로 쓰기 (설치 없이 브라우저에서)
+
+서버에서 웹앱을 띄우면, 사용자는 브라우저에서 구글드라이브 링크만 붙여넣어 결과를 받을 수 있습니다(설치 불필요).
+
+```bash
+pip install -r requirements.txt -r requirements-web.txt
+bash web/run-web.sh          # 기본 http://0.0.0.0:8077
+```
+
+- 브라우저에서 접속 → 영상 링크 입력 → "추출 시작" → 진행률 확인 → bundle.md 미리보기 / zip 다운로드.
+- 처리는 서버의 GPU에서 수행됩니다.
+- 외부(집 밖/동생)에서도 쓰려면 Cloudflare Tunnel 등으로 공개 URL을 연결하면 됩니다.
+
 ## 주요 옵션
 
 | 옵션 | 설명 |

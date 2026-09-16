@@ -1,0 +1,4 @@
+# 웹앱 백엔드 추가 의존성 (기본 requirements.txt 도 함께 설치)
+fastapi>=0.110
+uvicorn[standard]>=0.29
+python-multipart>=0.0.9

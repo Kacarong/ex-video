@@ -23,61 +23,18 @@ def main(argv=None):
     p.add_argument("--version", action="version", version=f"ex-video {__version__}")
     args = p.parse_args(argv)
 
-    out_dir = os.path.abspath(args.out)
-    os.makedirs(out_dir, exist_ok=True)
-
-    # 1) 입력 해석 (로컬/구글드라이브/URL)
-    from .download import resolve_input
-    video = resolve_input(args.input, out_dir)
-    print(f"[입력] {video}")
-
-    # 2) 음성 전사
-    transcript = []
-    if not args.skip_transcribe:
-        from .transcribe import transcribe
-        transcript = transcribe(video, model_size=args.model, language=args.lang,
-                                 device="cpu" if args.cpu else "auto")
-    else:
-        print("[전사] 생략됨(--skip-transcribe)")
-
-    # 3) 슬라이드 추출
-    from .slides import extract_slides
-    print("[슬라이드] 키프레임 추출/중복제거 중 ...")
-    slides = extract_slides(video, out_dir, sample_interval=args.sample_interval,
-                            diff_threshold=args.diff_threshold)
-    print(f"[슬라이드] 고유 슬라이드 {len(slides)}개")
-
-    # 4) 슬라이드별 OCR + 그림 크롭
-    gpu = not args.cpu
-    for sl in slides:
-        boxes = []
-        if not args.no_ocr:
-            try:
-                from .ocr import ocr_image
-                sl["ocr_text"], boxes = ocr_image(sl["path"], gpu=gpu)
-            except Exception as e:
-                print(f"  [OCR 경고] {sl['path']}: {e}")
-                sl["ocr_text"] = ""
-        else:
-            sl["ocr_text"] = ""
-        if not args.no_figures:
-            try:
-                from .figures import extract_figures
-                sl["figures"] = extract_figures(sl["path"], out_dir, text_boxes=boxes)
-            except Exception as e:
-                print(f"  [그림 경고] {sl['path']}: {e}")
-                sl["figures"] = []
-        else:
-            sl["figures"] = []
-        print(f"  슬라이드 {sl['index']} [{sl['ts']}] · 그림 {len(sl.get('figures', []))}개")
-
-    # 5) 프롬프트 묶음 생성
-    from .bundle import build_bundle
-    bundle_path = build_bundle(out_dir, transcript, slides)
+    from .pipeline import run_pipeline
+    res = run_pipeline(
+        args.input, os.path.abspath(args.out),
+        model=args.model, lang=args.lang,
+        sample_interval=args.sample_interval, diff_threshold=args.diff_threshold,
+        do_transcribe=not args.skip_transcribe, do_ocr=not args.no_ocr,
+        do_figures=not args.no_figures, cpu=args.cpu,
+    )
     print("\n완료!")
-    print(f"  - 프롬프트 묶음: {bundle_path}")
-    print(f"  - 슬라이드 이미지: {os.path.join(out_dir, 'slides')}")
-    print(f"  - 그림 이미지:   {os.path.join(out_dir, 'figures')}")
+    print(f"  - 프롬프트 묶음: {res['bundle']}")
+    print(f"  - 슬라이드 이미지: {res['slides_dir']}")
+    print(f"  - 그림 이미지:   {res['figures_dir']}")
     print("이 bundle.md 내용을 Gemini/Claude에 붙여넣고, 필요하면 슬라이드/그림 이미지를 함께 첨부하세요.")
     return 0
 
