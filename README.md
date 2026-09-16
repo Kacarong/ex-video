@@ -8,7 +8,18 @@ Gemini·Claude에 바로 붙여넣어 "원하는 구성/디자인으로 PDF 정�
 - 최종 정리·디자인은 사용자가 직접 Gemini/Claude에 붙여넣어 진행합니다.
 - 구글드라이브 공유 링크 / 로컬 파일 / URL 모두 입력 가능합니다.
 
-## 설치
+## 가장 쉬운 실행 (Windows, 더블클릭)
+
+Python 3.10+만 설치돼 있으면 됩니다(https://www.python.org/downloads/, 설치 시 "Add to PATH" 체크).
+
+1. 이 저장소를 내려받아 압축 해제(또는 clone).
+2. `setup.bat` 더블클릭 → 최초 1회 자동으로 필요한 패키지 설치(수 분 소요).
+3. `run.bat` 더블클릭 → 영상 파일 경로 또는 구글드라이브/URL 링크 입력 → 실행.
+4. 끝나면 `output` 폴더의 `bundle.md`를 열어 사용.
+
+> 참고: torch·Whisper 등 무거운 라이브러리 특성상 단일 .exe 배포는 용량이 매우 커서, 위 setup/run 방식으로 배포합니다. 단일 exe가 꼭 필요하면 GitHub Actions(Windows)로 빌드해 릴리즈에 첨부할 수 있습니다.
+
+## 설치 (수동)
 
 Python 3.10+ 필요. (GPU가 있으면 자동으로 CUDA 가속을 사용합니다.)
 
